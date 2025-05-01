@@ -1,8 +1,9 @@
-import time
 import threading
+import time
 from time_manager import get_current_time
 from word_mapper import map_time_to_words
 from display import start_display
+from telegram import start_bot
 
 # Optional: Funktion zum Anzeigen der Wörter im Terminal
 def display_words(words):
@@ -11,7 +12,6 @@ def display_words(words):
 
 
 def main_loop(refresh_seconds=30):
-    
     try:
         while True:
             current_time = get_current_time()
@@ -28,7 +28,11 @@ def main_loop(refresh_seconds=30):
 
 
 if __name__ == "__main__":
-    # ⏱️ Zeitloop in Hintergrund-Thread
+     # Telegram-Bot starten
+    bot_thread = threading.Thread(target=start_bot, daemon=True)
+    bot_thread.start()
+    
+    # Zeitloop in Hintergrund-Thread
     background_thread = threading.Thread(target=main_loop, daemon=True)
     background_thread.start()
 

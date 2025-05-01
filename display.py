@@ -2,11 +2,10 @@ import os
 os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
 
 import pygame
-import os
 import json
 import config
+import special_modes
 import datetime
-import logging
 
 from time_manager import get_current_time
 from word_mapper import map_time_to_words
@@ -14,20 +13,19 @@ from word_mapper import map_time_to_words
 base_path = os.path.dirname(__file__)
 file_path = os.path.join(base_path, "grid_layout.json")
 
-
 # Grundeinstellungen Uhr
 CELL_SIZE = config.CELL_SIZE
 GRID_WIDTH = config.GRID_WIDTH
 GRID_HEIGHT = config.GRID_HEIGHT
 FONT_SIZE = config.FONT_SIZE
-MARGIN = config.MARGIN
 BORDER = config.BORDER
 
 # Farben
 COLOR_BASE = config.COLOR_BASE
 COLOR_TARGET = config.COLOR_TARGET
 HEART_ACTIVE = config.HEART_ACTIVE
-HEART_INACTIVE = config.HEART_INACTIVE
+# Neue sanfte Herzfarbe für passives Herz-Highlight
+HEART_INACTIVE = (60, 30, 40)
 BG_COLOR = config.BG_COLOR
 FADE_SPEED = config.FADE_SPEED
 
@@ -36,6 +34,14 @@ with open(file_path, encoding="utf-8") as f:
     data = json.load(f)
     grid = data["grid"]
     words = data["words"]
+    heart_coords = set(tuple(pos) for pos in data["pixel_arts"]["heart"])
+
+def fade(current, target, step=FADE_SPEED):
+    if current < target:
+        return min(current + step, target)
+    elif current > target:
+        return max(current - step, target)
+    return current
 
 def get_ascii_grid(grid, active_positions):
     lines = []
@@ -58,18 +64,6 @@ def get_active_positions(active_words):
     return active_positions
 
 def start_display():
-    
-    import pygame
-
-    os.makedirs("logs", exist_ok=True)
-
-    logging.basicConfig(
-        filename="logs/clock_output.log",
-        level=logging.INFO,
-        format="%(asctime)s %(message)s",
-        datefmt="[%H:%M:%S]"
-    )
-
     # === Pygame Setup ===
     pygame.init()
     font = pygame.font.SysFont("monospace", FONT_SIZE)
@@ -87,7 +81,7 @@ def start_display():
     letter_intensity = {}
     for row in range(GRID_HEIGHT):
         for col in range(GRID_WIDTH):
-            letter_intensity[(row, col)] = COLOR_BASE[0]
+            letter_intensity[(row, col)] = COLOR_BASE
 
     running = True
     while running:
@@ -101,31 +95,42 @@ def start_display():
             active_words = map_time_to_words(now_rounded.hour, now_rounded.minute)
             active_positions = get_active_positions(active_words)
             current_minute = now.minute
-            ascii = get_ascii_grid(grid, active_positions)
-            text_words = " ".join(active_words)
-            logging.info(f"Neue Anzeige: {text_words}\n{ascii}\n")
 
         screen.fill(BG_COLOR)
 
         for row in range(GRID_HEIGHT):
             for col in range(GRID_WIDTH):
                 pos = (row, col)
-                target_intensity = COLOR_TARGET[0] if pos in active_positions else COLOR_BASE[0]
-                current = letter_intensity[pos]
+                cur_r, cur_g, cur_b = letter_intensity[pos]
 
-                if current < target_intensity:
-                    current = min(current + FADE_SPEED, target_intensity)
-                elif current > target_intensity:
-                    current = max(current - FADE_SPEED, target_intensity)
+                if pos in active_positions:
+                    if special_modes.HEART_MODE and pos in heart_coords:
+                        target_color = HEART_ACTIVE
+                    else:
+                        target_color = COLOR_TARGET
 
-                letter_intensity[pos] = current
+                    r = fade(cur_r, target_color[0])
+                    g = fade(cur_g, target_color[1])
+                    b = fade(cur_b, target_color[2])
+                    letter_intensity[pos] = (r, g, b)
 
+                elif special_modes.HEART_MODE and pos in heart_coords:
+                    # Kein Fade für passives Herz, direkt zeichnen
+                    r, g, b = HEART_INACTIVE
+                    letter_intensity[pos] = (r, g, b)
+
+                else:
+                    r = fade(cur_r, COLOR_BASE[0])
+                    g = fade(cur_g, COLOR_BASE[1])
+                    b = fade(cur_b, COLOR_BASE[2])
+                    letter_intensity[pos] = (r, g, b)
+
+                color = (r, g, b)
                 try:
                     letter = grid[row][col]
                 except IndexError:
                     continue
 
-                color = (current, current, current)
                 text = font.render(letter, True, color)
                 x = BORDER + col * CELL_SIZE
                 y = BORDER + row * CELL_SIZE
@@ -135,13 +140,6 @@ def start_display():
         clock.tick(30)
 
     pygame.quit()
-
-def activate_heart_mode():
-    global heart_mode_active, heart_mode_end_time
-    heart_mode_active = True
-    heart_mode_end_time = datetime.datetime.now() + datetime.timedelta(hours=1)
-    print("[DISPLAY] Herz-Modus aktiviert für 1 Stunde.")
-
 
 if __name__ == "__main__":
     start_display()
