@@ -1,4 +1,4 @@
-from clockpi.config import TELEGRAM_TOKEN
+from config import TELEGRAM_TOKEN
 import telebot
 import pygame
 import io

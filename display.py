@@ -21,6 +21,7 @@ GRID_WIDTH = config.GRID_WIDTH
 GRID_HEIGHT = config.GRID_HEIGHT
 FONT_SIZE = config.FONT_SIZE
 MARGIN = config.MARGIN
+BORDER = config.BORDER
 
 # Farben
 COLOR_BASE = config.COLOR_BASE
@@ -72,8 +73,8 @@ def start_display():
     # === Pygame Setup ===
     pygame.init()
     font = pygame.font.SysFont("monospace", FONT_SIZE)
-    screen_width = GRID_WIDTH * CELL_SIZE + MARGIN * 2
-    screen_height = GRID_HEIGHT * CELL_SIZE + MARGIN * 2
+    screen_width = GRID_WIDTH * CELL_SIZE + BORDER * 2
+    screen_height = GRID_HEIGHT * CELL_SIZE + BORDER * 2
     screen = pygame.display.set_mode((screen_width, screen_height))
     pygame.display.set_caption("Mundart Wortuhr")
     clock = pygame.time.Clock()
@@ -126,8 +127,8 @@ def start_display():
 
                 color = (current, current, current)
                 text = font.render(letter, True, color)
-                x = MARGIN + col * CELL_SIZE
-                y = MARGIN + row * CELL_SIZE
+                x = BORDER + col * CELL_SIZE
+                y = BORDER + row * CELL_SIZE
                 screen.blit(text, (x, y))
 
         pygame.display.flip()
