@@ -4,12 +4,26 @@ from time_manager import get_current_time
 from word_mapper import map_time_to_words
 from display import start_display
 from telegram import start_bot
+import logging
+import os
 
-# Optional: Funktion zum Anzeigen der Wörter im Terminal
+# Logs-Verzeichnis erstellen, falls nicht vorhanden
+os.makedirs("logs", exist_ok=True)
+
+# Logging-Konfiguration (Konsole + Datei)
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(message)s",
+    handlers=[
+        logging.FileHandler("logs/wordclock.log"),
+        logging.StreamHandler()
+    ]
+)
+
+# logging der Uhrzeit
 def display_words(words):
-    print("\nAktuelle Anzeige: ")
-    print(" ".join(words))
-
+    sentence = " ".join(words)
+    logging.info(sentence)
 
 def main_loop(refresh_seconds=30):
     try:
