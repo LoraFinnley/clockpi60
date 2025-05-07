@@ -3,31 +3,28 @@ os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
 
 import pygame
 import json
-import config
 import datetime
-import importlib
 import time
 
 from time_manager import get_current_time
 from word_mapper import map_time_to_words
+from config import Settings
 
 last_reload = time.time()
 base_path = os.path.dirname(__file__)
 file_path = os.path.join(base_path, "grid_layout.json")
 
 # Grundeinstellungen Uhr
-GRID_WIDTH = config.GRID_WIDTH
-GRID_HEIGHT = config.GRID_HEIGHT
-FONT_SIZE = config.FONT_SIZE
-BORDER = config.BORDER
+GRID_WIDTH = Settings.GRID_WIDTH
+GRID_HEIGHT = Settings.GRID_HEIGHT
+FONT_SIZE = Settings.FONT_SIZE
+BORDER = Settings.BORDER
 
-# Farben
-COLOR_BASE = config.COLOR_BASE
-COLOR_TARGET = config.COLOR_TARGET
-HEART_ACTIVE = config.HEART_ACTIVE
-HEART_INACTIVE = (60, 30, 40)
-BG_COLOR = config.BG_COLOR
-FADE_SPEED = config.FADE_SPEED
+COLOR_BASE = Settings.COLOR_BASE
+COLOR_TARGET = Settings.COLOR_TARGET
+HEART_ACTIVE = Settings.HEART_ACTIVE
+BG_COLOR = Settings.BG_COLOR
+FADE_SPEED = Settings.FADE_SPEED
 
 # === Grid-Daten laden ===
 with open(file_path, encoding="utf-8") as f:
@@ -90,11 +87,6 @@ def start_display():
     running = True
     
     while running:
-        if time.time() - last_reload > 2:
-            config = importlib.reload(config)
-            last_reload = time.time()
-
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -115,7 +107,7 @@ def start_display():
                 cur_r, cur_g, cur_b = letter_intensity[pos]
 
                 if pos in active_positions:
-                    if config.HEART_MODE and pos in heart_coords:
+                    if Settings.HEART_MODE and pos in heart_coords:
                         target_color = HEART_ACTIVE
                     else:
                         target_color = COLOR_TARGET
@@ -125,7 +117,7 @@ def start_display():
                     b = fade(cur_b, target_color[2])
                     letter_intensity[pos] = (r, g, b)
 
-                elif config.HEART_MODE and pos in heart_coords:
+                elif Settings.HEART_MODE and pos in heart_coords:
                     r, g, b = HEART_INACTIVE
                     letter_intensity[pos] = (r, g, b)
 

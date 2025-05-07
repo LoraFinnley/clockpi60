@@ -4,7 +4,7 @@ import pygame
 import telebot
 import tempfile
 from datetime import datetime, timedelta
-import config
+from config import Settings
 
 
 
@@ -39,8 +39,8 @@ def send_uhr_screenshot(message):
 # 💖 Herzmodus ein-/ausschalten
 @bot.message_handler(commands=['heartmode'])
 def toggle_heart_mode(message):
-    config.HEART_MODE = not config.HEART_MODE
-    status = "aktiviert 💖" if config.HEART_MODE else "deaktiviert 💔"
+    Settings.HEART_MODE = not Settings.HEART_MODE
+    status = "aktiviert 💖" if Settings.HEART_MODE else "deaktiviert 💔"
     bot.reply_to(message, f"Herzmodus wurde {status}.")
 
 
