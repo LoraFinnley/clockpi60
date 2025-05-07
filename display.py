@@ -76,6 +76,9 @@ def start_display():
 
     screen_width = GRID_WIDTH * cell_size + BORDER * 2
     screen_height = GRID_HEIGHT * cell_size + BORDER * 2
+    offset_x = (display_width - screen_width) // 2
+    offset_y = (display_height - screen_height) // 2
+
 
     screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
     pygame.display.set_caption("Mundart Wortuhr")
@@ -140,8 +143,9 @@ def start_display():
                 color = (r, g, b)
                 letter = grid[row][col]
                 text = font.render(letter, True, color)
-                x = BORDER + col * cell_size
-                y = BORDER + row * cell_size
+                x = offset_x + BORDER + col * cell_size
+                y = offset_y + BORDER + row * cell_size
+
                 screen.blit(text, (x, y))
 
         pygame.display.flip()
