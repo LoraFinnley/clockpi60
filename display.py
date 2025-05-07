@@ -5,10 +5,13 @@ import pygame
 import json
 import config
 import datetime
+import importlib
+import time
 
 from time_manager import get_current_time
 from word_mapper import map_time_to_words
 
+last_reload = time.time()
 base_path = os.path.dirname(__file__)
 file_path = os.path.join(base_path, "grid_layout.json")
 
@@ -40,18 +43,6 @@ def fade(current, target, step=FADE_SPEED):
         return max(current - step, target)
     return current
 
-def get_ascii_grid(grid, active_positions):
-    lines = []
-    for row in range(len(grid)):
-        line = ""
-        for col in range(len(grid[row])):
-            char = grid[row][col]
-            if (row, col) in active_positions:
-                line += char.upper() + " "
-            else:
-                line += char.lower() + " "
-        lines.append(line)
-    return "\n".join(lines)
 
 def get_active_positions(active_words):
     active_positions = set()
@@ -99,6 +90,10 @@ def start_display():
     running = True
     
     while running:
+        if time.time() - last_reload > 2:
+            config = importlib.reload(config)
+            last_reload = time.time()
+
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -131,7 +126,6 @@ def start_display():
                     letter_intensity[pos] = (r, g, b)
 
                 elif config.HEART_MODE and pos in heart_coords:
-                    # Kein Fade für passives Herz, direkt zeichnen
                     r, g, b = HEART_INACTIVE
                     letter_intensity[pos] = (r, g, b)
 
