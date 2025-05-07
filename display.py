@@ -143,10 +143,12 @@ def start_display():
                 color = (r, g, b)
                 letter = grid[row][col]
                 text = font.render(letter, True, color)
-                x = offset_x + BORDER + col * cell_size
-                y = offset_y + BORDER + row * cell_size
-
-                screen.blit(text, (x, y))
+                text_rect = text.get_rect()
+                text_rect.center = (
+                    offset_x + BORDER + col * cell_size + cell_size // 2,
+                    offset_y + BORDER + row * cell_size + cell_size // 2
+                )
+                screen.blit(text, text_rect)
 
         pygame.display.flip()
         clock.tick(30)
