@@ -4,10 +4,7 @@ os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
 import pygame
 import json
 import config
-import special_modes
 import datetime
-import time
-import importlib
 
 from time_manager import get_current_time
 from word_mapper import map_time_to_words
@@ -100,13 +97,9 @@ def start_display():
     }
 
     running = True
-    last_reload = time.time()
     
     while running:
-        if time.time() - last_reload > 2:
-            special_modes = importlib.reload(special_modes)
-            last_reload = time.time()
-            
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -127,7 +120,7 @@ def start_display():
                 cur_r, cur_g, cur_b = letter_intensity[pos]
 
                 if pos in active_positions:
-                    if special_modes.HEART_MODE and pos in heart_coords:
+                    if config.HEART_MODE and pos in heart_coords:
                         target_color = HEART_ACTIVE
                     else:
                         target_color = COLOR_TARGET
@@ -137,7 +130,7 @@ def start_display():
                     b = fade(cur_b, target_color[2])
                     letter_intensity[pos] = (r, g, b)
 
-                elif special_modes.HEART_MODE and pos in heart_coords:
+                elif config.HEART_MODE and pos in heart_coords:
                     # Kein Fade für passives Herz, direkt zeichnen
                     r, g, b = HEART_INACTIVE
                     letter_intensity[pos] = (r, g, b)

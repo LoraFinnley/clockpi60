@@ -2,9 +2,12 @@ import os
 from dotenv import load_dotenv
 import pygame
 import telebot
-import special_modes
 import tempfile
 from datetime import datetime, timedelta
+import config
+
+
+
 
 # 🔄 .env laden und prüfen
 load_dotenv()
@@ -36,8 +39,8 @@ def send_uhr_screenshot(message):
 # 💖 Herzmodus ein-/ausschalten
 @bot.message_handler(commands=['heartmode'])
 def toggle_heart_mode(message):
-    special_modes.HEART_MODE = not special_modes.HEART_MODE
-    status = "aktiviert 💖" if special_modes.HEART_MODE else "deaktiviert 💔"
+    config.HEART_MODE = not config.HEART_MODE
+    status = "aktiviert 💖" if config.HEART_MODE else "deaktiviert 💔"
     bot.reply_to(message, f"Herzmodus wurde {status}.")
 
 

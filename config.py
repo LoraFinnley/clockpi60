@@ -1,3 +1,5 @@
+HEART_MODE = False
+
 # Grundeinstellungen Uhr
 CELL_SIZE = 60
 GRID_WIDTH = 11
