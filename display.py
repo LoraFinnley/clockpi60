@@ -14,7 +14,6 @@ base_path = os.path.dirname(__file__)
 file_path = os.path.join(base_path, "grid_layout.json")
 
 # Grundeinstellungen Uhr
-CELL_SIZE = config.CELL_SIZE
 GRID_WIDTH = config.GRID_WIDTH
 GRID_HEIGHT = config.GRID_HEIGHT
 FONT_SIZE = config.FONT_SIZE
@@ -24,7 +23,6 @@ BORDER = config.BORDER
 COLOR_BASE = config.COLOR_BASE
 COLOR_TARGET = config.COLOR_TARGET
 HEART_ACTIVE = config.HEART_ACTIVE
-# Neue sanfte Herzfarbe für passives Herz-Highlight
 HEART_INACTIVE = (60, 30, 40)
 BG_COLOR = config.BG_COLOR
 FADE_SPEED = config.FADE_SPEED
@@ -64,17 +62,25 @@ def get_active_positions(active_words):
     return active_positions
 
 def start_display():
-    # === Pygame Setup ===
     pygame.init()
     pygame.mouse.set_visible(False)
 
-    font = pygame.font.SysFont("monospace", FONT_SIZE)
-    screen_width = GRID_WIDTH * CELL_SIZE + BORDER * 2
-    screen_height = GRID_HEIGHT * CELL_SIZE + BORDER * 2
+    info = pygame.display.Info()
+    display_width = info.current_w
+    display_height = info.current_h
+
+    cell_size = min(
+        (display_width - 2 * BORDER) // GRID_WIDTH,
+        (display_height - 2 * BORDER) // GRID_HEIGHT
+    )
+
+    screen_width = GRID_WIDTH * cell_size + BORDER * 2
+    screen_height = GRID_HEIGHT * cell_size + BORDER * 2
 
     screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
     pygame.display.set_caption("Mundart Wortuhr")
 
+    font = pygame.font.SysFont("monospace", FONT_SIZE)
     clock = pygame.time.Clock()
 
     now = get_current_time()
@@ -82,10 +88,11 @@ def start_display():
     active_words = map_time_to_words(now.hour, now.minute)
     active_positions = get_active_positions(active_words)
 
-    letter_intensity = {}
-    for row in range(GRID_HEIGHT):
-        for col in range(GRID_WIDTH):
-            letter_intensity[(row, col)] = COLOR_BASE
+    letter_intensity = {
+        (row, col): COLOR_BASE
+            for row in range(GRID_HEIGHT)
+            for col in range(GRID_WIDTH)
+    }
 
     running = True
     while running:
@@ -94,6 +101,7 @@ def start_display():
                 running = False
 
         now = datetime.datetime.now()
+
         if now.minute != current_minute:
             now_rounded = get_current_time()
             active_words = map_time_to_words(now_rounded.hour, now_rounded.minute)
@@ -130,14 +138,10 @@ def start_display():
                     letter_intensity[pos] = (r, g, b)
 
                 color = (r, g, b)
-                try:
-                    letter = grid[row][col]
-                except IndexError:
-                    continue
-
+                letter = grid[row][col]
                 text = font.render(letter, True, color)
-                x = BORDER + col * CELL_SIZE
-                y = BORDER + row * CELL_SIZE
+                x = BORDER + col * cell_size
+                y = BORDER + row * cell_size
                 screen.blit(text, (x, y))
 
         pygame.display.flip()
