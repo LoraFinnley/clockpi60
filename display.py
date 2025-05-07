@@ -6,6 +6,7 @@ import json
 import config
 import special_modes
 import datetime
+import importlib
 
 from time_manager import get_current_time
 from word_mapper import map_time_to_words
@@ -99,6 +100,7 @@ def start_display():
 
     running = True
     while running:
+        special_modes = importlib.reload(special_modes)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
