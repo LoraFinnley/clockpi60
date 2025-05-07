@@ -6,6 +6,7 @@ import json
 import config
 import special_modes
 import datetime
+import time
 import importlib
 
 from time_manager import get_current_time
@@ -99,8 +100,13 @@ def start_display():
     }
 
     running = True
+    last_reload = time.time()
+    
     while running:
-        special_modes = importlib.reload(special_modes)
+        if time.time() - last_reload > 2:
+            special_modes = importlib.reload(special_modes)
+            last_reload = time.time()
+            
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
