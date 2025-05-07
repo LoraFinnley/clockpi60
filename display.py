@@ -66,11 +66,15 @@ def get_active_positions(active_words):
 def start_display():
     # === Pygame Setup ===
     pygame.init()
+    pygame.mouse.set_visible(False)
+
     font = pygame.font.SysFont("monospace", FONT_SIZE)
     screen_width = GRID_WIDTH * CELL_SIZE + BORDER * 2
     screen_height = GRID_HEIGHT * CELL_SIZE + BORDER * 2
-    screen = pygame.display.set_mode((screen_width, screen_height))
+
+    screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
     pygame.display.set_caption("Mundart Wortuhr")
+
     clock = pygame.time.Clock()
 
     now = get_current_time()
