@@ -4,7 +4,7 @@ class Settings:
     CELL_SIZE = 60
     GRID_WIDTH = 11
     GRID_HEIGHT = 10
-    FONT_SIZE = 48
+    FONT_SIZE = 55
     BORDER = 30
 
     # Farben
